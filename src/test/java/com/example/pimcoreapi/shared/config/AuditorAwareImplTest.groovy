@@ -6,9 +6,9 @@ class AuditorAwareImplTest extends Specification {
 
     def "should return an empty Optional when the current auditor's name is an empty string"() {
         given:
-        AuditorAwareImpl auditorAware = new AuditorAwareImpl()
+        def auditorAware = new AuditorAwareImpl()
         when:
-        Optional<String> result = auditorAware.getCurrentAuditor()
+        def result = auditorAware.getCurrentAuditor()
         then:
         !result.isPresent()
     }
