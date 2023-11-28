@@ -15,6 +15,7 @@ import spock.lang.Specification
 import spock.lang.Subject
 import spock.lang.Timeout
 
+import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 
 @Slf4j
@@ -86,5 +87,18 @@ class ChannelServicePortTest extends Specification {
         def exception = thrown(Exception)
         exception instanceof IsEmptyException
         exception.message == "The argument: Name is empty for object: Created Channel"
+    }
+
+    @Timeout(value = 100, unit = TimeUnit.MILLISECONDS)
+    def "should delete a channel with a valid id"() {
+        given:
+        def id = "validId"
+        def channelDto = new ResourceChannelDto(id: id, name: "Test Channel", code: "TC", createdBy: "User", createdDate: LocalDateTime.now(), lastModifiedBy: "User", lastModifiedDate: LocalDateTime.now())
+        channelPersistencePortMock.findById(_ as String) >> channelDto
+        when:
+        this.subject.deleteById(id)
+        then:
+        1 * channelPersistencePortMock.findById(id) >> channelDto
+        1 * channelPersistencePortMock.deleteById(id)
     }
 }
