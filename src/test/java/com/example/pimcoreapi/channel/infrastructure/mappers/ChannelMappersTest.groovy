@@ -31,7 +31,7 @@ class ChannelMappersTest extends Specification {
     }
 
     @Timeout(value = 100, unit = TimeUnit.MILLISECONDS)
-    def "should mapper channel with valid input and return Channel entity object"() {
+    def "toModelCreate: should mapper channel with valid input and return Channel entity object"() {
         given:
         def createChannelDtoMock = new CreateChannelDto([ name: this.nameChannelMock])
         when:
@@ -42,7 +42,7 @@ class ChannelMappersTest extends Specification {
     }
 
     @Timeout(value = 100, unit = TimeUnit.MILLISECONDS)
-    def "should throw an exception when given a CreateChannelDto with a null"() {
+    def "toModelCreate: should throw an exception when given a CreateChannelDto with a null"() {
         given:
         def createChannelDtoMock = null
         when:
@@ -54,7 +54,7 @@ class ChannelMappersTest extends Specification {
     }
 
     @Timeout(value = 100, unit = TimeUnit.MILLISECONDS)
-    def "should throw an exception when given a CreateChannelDto with a name null"() {
+    def "toModelCreate should throw an exception when given a CreateChannelDto with a name null"() {
         given:
         def createChannelDtoMock = new CreateChannelDto()
         when:
@@ -66,7 +66,7 @@ class ChannelMappersTest extends Specification {
     }
 
     @Timeout(value = 100, unit = TimeUnit.MILLISECONDS)
-    def "should throw an exception when given a CreateChannelDto with a name is empty"() {
+    def "toModelCreate: should throw an exception when given a CreateChannelDto with a name is empty"() {
         given:
         def createChannelDtoMock = new CreateChannelDto([ name: ""])
         when:
@@ -78,7 +78,7 @@ class ChannelMappersTest extends Specification {
     }
 
     @Timeout(value = 100, unit = TimeUnit.MILLISECONDS)
-    def "should mapper channel with valid input and return ResourceChannelDto then entity object"() {
+    def "toResource: should mapper channel with valid input and return ResourceChannelDto then entity object"() {
         given:
         def resourceChannelDtoMock = new ResourceChannelDto([ name: this.nameChannelMock, code: this.codeChannelMock])
         when:
@@ -86,5 +86,15 @@ class ChannelMappersTest extends Specification {
         then:
         result.name == resourceChannelDtoMock.name
         result.code == resourceChannelDtoMock.code
+    }
+
+    @Timeout(value = 100, unit = TimeUnit.MILLISECONDS)
+    def "toResource: should mapper channel with valid input and return ResourceChannelDto then entity object"() {
+        given:
+        def resourceChannelDtoMock = new ResourceChannelDto([ name: this.nameChannelMock, code: this.codeChannelMock])
+        when:
+        def result = this.subject.toResource(null)
+        then:
+        result == null
     }
 }

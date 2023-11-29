@@ -8,10 +8,11 @@ import com.example.pimcoreapi.channel.infrastructure.mappers.ChannelMappers
 import com.example.pimcoreapi.channel.infrastructure.mappers.ChannelMappersImpl
 import com.example.pimcoreapi.channel.infrastructure.repository.ChannelRepository
 import lombok.extern.slf4j.Slf4j
-import org.spockframework.spring.SpringBean
-import org.springframework.boot.test.context.SpringBootTest
 import spock.lang.Specification
 import spock.lang.Subject
+import spock.lang.Timeout
+
+import java.util.concurrent.TimeUnit
 
 @Slf4j
 class ChannelPersistencePortTest extends Specification {
@@ -27,21 +28,14 @@ class ChannelPersistencePortTest extends Specification {
         this.subject = new ChannelPersistencePortAdapter(repository, mapper)
     }
 
-    def "should create channel with valid input and return ResourceChannelDto object"() {
+    @Timeout(value = 100, unit = TimeUnit.MILLISECONDS)
+    def "create: should create channel with valid input and return ResourceChannelDto object"() {
         given:
-        def channelDto = CreateChannelDto.builder()
-                .name("Test Channel")
-                .build()
+        def name = "Test Channel"
         def code = "12345"
-        def entityResult = new Channel();
-        entityResult.setId('id')
-        entityResult.setName("Test Channel")
-        entityResult.setCode("12345")
-        def expectResult = ResourceChannelDto.builder()
-                .id("id")
-                .name("Test Channel")
-                .code("12345")
-                .build()
+        def channelDto = new CreateChannelDto([name: name])
+        def entityResult = new Channel([id: "id", name: name, code: code])
+        def expectResult = new ResourceChannelDto([id: "id", name: name, code: code])
         when:
         def result = subject.create(channelDto, code)
         then:
@@ -50,9 +44,44 @@ class ChannelPersistencePortTest extends Specification {
         1 * this.mapper.toResource(_) >> expectResult
         and:
         result instanceof ResourceChannelDto
-        result.id == expectResult.id
-        result.name == expectResult.name
-        result.code == expectResult.code
+        verifyAll(result) {
+            id == expectResult.id
+            name == expectResult.name
+            code == expectResult.code
+        }
     }
 
+    def "findById: should return ResourceChannelDto when a valid id is passed"() {
+        given:
+        def id = "validId"
+        def expectedResourceChannelDto = new ResourceChannelDto()
+        def channelMock = new Channel()
+        when:
+        def result = subject.findById(id)
+        then:
+        1 * this.repository.findById(_ as String) >> Optional.of(channelMock)
+        1 * this.mapper.toResource(_ as Channel) >> expectedResourceChannelDto
+        and:
+        result == expectedResourceChannelDto
+    }
+
+    def "findById: should return null when id is null"() {
+        given:
+        def id = "invalid"
+        when:
+        def result = subject.findById(id)
+        then:
+        1 * this.repository.findById(_ as String) >> Optional.ofNullable(null)
+        and:
+        result == null
+    }
+
+    def "deleteById: should delete an existing channel with a valid id"() {
+        given:
+        def id = "validId"
+        when:
+        subject.deleteById(id)
+        then:
+        1 * repository.deleteById(id)
+    }
 }

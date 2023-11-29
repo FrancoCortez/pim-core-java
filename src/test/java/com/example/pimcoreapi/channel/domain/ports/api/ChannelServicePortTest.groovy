@@ -6,11 +6,10 @@ import com.example.pimcoreapi.channel.domain.ports.spi.ChannelPersistencePort
 import com.example.pimcoreapi.channel.domain.service.ChannelServicePortAdapter
 import com.example.pimcoreapi.channel.infrastructure.adapters.ChannelPersistencePortAdapter
 import com.example.pimcoreapi.shared.exception.domain.IsEmptyException
+import com.example.pimcoreapi.shared.exception.domain.NotFoundException
 import com.example.pimcoreapi.shared.exception.domain.ObjectNullException
 import com.example.pimcoreapi.shared.utils.Utils
 import groovy.util.logging.Slf4j
-import org.spockframework.spring.SpringBean
-import org.springframework.boot.test.context.SpringBootTest
 import spock.lang.Specification
 import spock.lang.Subject
 import spock.lang.Timeout
@@ -80,7 +79,7 @@ class ChannelServicePortTest extends Specification {
     @Timeout(value = 100, unit = TimeUnit.MILLISECONDS)
     def "should throw an exception when given a CreateChannelDto with a name is empty"() {
         given:
-        def createChannelDtoMock = new CreateChannelDto([ name: ""])
+        def createChannelDtoMock = new CreateChannelDto([name: ""])
         when:
         this.subject.create(createChannelDtoMock)
         then:
@@ -94,11 +93,38 @@ class ChannelServicePortTest extends Specification {
         given:
         def id = "validId"
         def channelDto = new ResourceChannelDto(id: id, name: "Test Channel", code: "TC", createdBy: "User", createdDate: LocalDateTime.now(), lastModifiedBy: "User", lastModifiedDate: LocalDateTime.now())
-        channelPersistencePortMock.findById(_ as String) >> channelDto
         when:
         this.subject.deleteById(id)
         then:
         1 * channelPersistencePortMock.findById(id) >> channelDto
         1 * channelPersistencePortMock.deleteById(id)
     }
+
+    @Timeout(value = 100, unit = TimeUnit.MILLISECONDS)
+    def "should delete a channel with a null id"() {
+        given:
+        def id = null
+        when:
+        this.subject.deleteById(id)
+        then:
+        def exception = thrown(Exception)
+        exception instanceof IsEmptyException
+        exception.message == "The argument: id is empty for object: Channel"
+    }
+
+    @Timeout(value = 100, unit = TimeUnit.MILLISECONDS)
+    def "should delete a channel with a invalid id"() {
+        given:
+        def id = "Not Valid Id"
+        when:
+        this.subject.deleteById(id)
+        then:
+        1 * channelPersistencePortMock.findById(id) >> null
+        and:
+        def exception = thrown(Exception)
+        exception instanceof NotFoundException
+        exception.message == "The Channel object for id Not Valid Id not found"
+    }
+
+
 }
