@@ -13,22 +13,19 @@ import lombok.extern.slf4j.Slf4j
 import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.MockMvcBuilder
-import org.springframework.test.web.servlet.setup.MockMvcBuilders
-import org.springframework.web.context.WebApplicationContext
 import spock.lang.Specification
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
+
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+
 //import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 
 @AutoConfigureMockMvc
 @SpringBootTest
 @Slf4j
-//@WebMvcTest(ChannelController.class)
 class ChannelControllerTest extends Specification {
 
     @SpringBean
@@ -40,8 +37,8 @@ class ChannelControllerTest extends Specification {
     ObjectMapper objectMapper = new ObjectMapper()
 
 
-    void setup (){
-        this.objectMapper.registerModule(new JavaTimeModule());
+    void setup() {
+        this.objectMapper.registerModule(new JavaTimeModule())
     }
 
     def "Post type channel test for successful creation with a valid input and returning an object as a 200 response from the channel"() {
@@ -60,7 +57,7 @@ class ChannelControllerTest extends Specification {
         1 * createChannelUserCase.unitCreate(requestBody) >> expectedResponse
         and:
         result.getResponse().getStatus() == 200
-        def actualResponseJson = objectMapper.readValue(result.getResponse().getContentAsString(), ResourceChannelDto.class )
+        def actualResponseJson = objectMapper.readValue(result.getResponse().getContentAsString(), ResourceChannelDto.class)
         verifyAll {
             actualResponseJson.name == expectedResponse.name
             actualResponseJson.code == expectedResponse.code
@@ -81,14 +78,15 @@ class ChannelControllerTest extends Specification {
         1 * createChannelUserCase.unitCreate(requestBody) >> { throw new ObjectNullException('Name') }
         and:
         result.getResponse().getStatus() == 400
-        def actualResponseJson = objectMapper.readValue(result.getResponse().getContentAsString(), ErrorResponse.class )
-        verifyAll () {
+        def actualResponseJson = objectMapper.readValue(result.getResponse().getContentAsString(), ErrorResponse.class)
+        verifyAll() {
             actualResponseJson.status == 400
             actualResponseJson.error == 'Bad Request'
             actualResponseJson.message == 'Validation failed'
             actualResponseJson.path == 'uri=/api/channel'
         }
     }
+
     def "Delete channel test for successful deletion"() {
         given:
         String channelId = "someChannelId"

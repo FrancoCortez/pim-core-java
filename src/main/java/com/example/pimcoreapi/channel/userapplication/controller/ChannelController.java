@@ -19,7 +19,7 @@ public class ChannelController {
     private final DeleteChannelUserCase deleteChannelUserCase;
 
     @PostMapping
-    public ResponseEntity<ResourceChannelDto> create (@Valid @RequestBody CreateChannelDto channelDto) {
+    public ResponseEntity<ResourceChannelDto> create(@Valid @RequestBody CreateChannelDto channelDto) {
         return ResponseEntity.ok(this.createChannelUserCase.unitCreate(channelDto));
     }
 

@@ -2,7 +2,9 @@ package com.example.pimcoreapi.channel.infrastructure.entities;
 
 import com.example.pimcoreapi.shared.infrastructure.entity.BaseIdEntity;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity

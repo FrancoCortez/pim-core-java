@@ -5,6 +5,7 @@ import com.example.pimcoreapi.channel.domain.data.channel.ResourceChannelDto;
 
 public interface ChannelServicePort {
 
-    ResourceChannelDto create (CreateChannelDto channelDto);
+    ResourceChannelDto create(CreateChannelDto channelDto);
+
     void deleteById(String id);
 }

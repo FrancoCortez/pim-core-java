@@ -1,7 +1,6 @@
 package com.example.pimcoreapi.shared.exception.domain;
 
 import com.example.pimcoreapi.shared.exception.base.BusinessException;
-import com.example.pimcoreapi.shared.exception.base.InfrastructureException;
 
 public class ObjectNullException extends BusinessException {
     public ObjectNullException(String object) {

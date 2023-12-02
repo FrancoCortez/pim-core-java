@@ -7,7 +7,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.web.context.request.WebRequest
 import spock.lang.Specification
 
-class GlobalExceptionHandlerTest extends Specification{
+class GlobalExceptionHandlerTest extends Specification {
     def "should handle BusinessExceptions and return a ResponseEntity with a BadRequest status code and an ErrorResponse object containing the exception message"() {
         given:
         def ex = new BusinessException("Test Exception")
@@ -25,7 +25,7 @@ class GlobalExceptionHandlerTest extends Specification{
         error.status == 400
     }
 
-    def "should return a ResponseEntity with a BAD_REQUEST status code when given an InfrastructureException" () {
+    def "should return a ResponseEntity with a BAD_REQUEST status code when given an InfrastructureException"() {
         given:
         def ex = new InfrastructureException("Test Exception")
         def request = Mock(WebRequest)
@@ -42,7 +42,7 @@ class GlobalExceptionHandlerTest extends Specification{
         error.status == 400
     }
 
-    def "should return a ResponseEntity object with an ErrorResponse object and HttpStatus.INTERNAL_SERVER_ERROR status code" () {
+    def "should return a ResponseEntity object with an ErrorResponse object and HttpStatus.INTERNAL_SERVER_ERROR status code"() {
         given:
         def ex = new Exception("Test Exception")
         def request = Mock(WebRequest)

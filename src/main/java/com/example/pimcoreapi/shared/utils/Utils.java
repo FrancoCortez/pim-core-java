@@ -9,7 +9,7 @@ import java.text.Normalizer;
 @RequiredArgsConstructor
 public class Utils {
 
-    public String generateCode (String text) {
+    public String generateCode(String text) {
         String normalizeText = Normalizer.normalize(text, Normalizer.Form.NFD)
                 .replaceAll("[^\\p{ASCII}]", "")
                 .toLowerCase();

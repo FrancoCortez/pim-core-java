@@ -10,15 +10,15 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface ChannelMappers {
 
-    default Channel toModelCreate (CreateChannelDto dto, String code ) {
-        if(dto == null) {
+    default Channel toModelCreate(CreateChannelDto dto, String code) {
+        if (dto == null) {
             throw new ObjectNullException("Channel Created");
         }
-        if(dto.getName() == null) {
-            throw  new ObjectNullException("Name");
+        if (dto.getName() == null) {
+            throw new ObjectNullException("Name");
         }
-        if(dto.getName().isEmpty() || dto.getName().isBlank()) {
-            throw  new IsEmptyException("Name", "Channel Created");
+        if (dto.getName().isEmpty() || dto.getName().isBlank()) {
+            throw new IsEmptyException("Name", "Channel Created");
         }
         Channel entity = new Channel();
         entity.setName(dto.getName());
@@ -26,5 +26,5 @@ public interface ChannelMappers {
         return entity;
     }
 
-    ResourceChannelDto toResource (Channel entity);
+    ResourceChannelDto toResource(Channel entity);
 }

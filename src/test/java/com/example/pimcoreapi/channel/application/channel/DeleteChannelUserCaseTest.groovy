@@ -1,18 +1,12 @@
 package com.example.pimcoreapi.channel.application.channel
 
-import com.example.pimcoreapi.channel.domain.data.channel.CreateChannelDto
-import com.example.pimcoreapi.channel.domain.data.channel.ResourceChannelDto
+
 import com.example.pimcoreapi.channel.domain.ports.api.ChannelServicePort
 import com.example.pimcoreapi.channel.domain.service.ChannelServicePortAdapter
 import com.example.pimcoreapi.shared.exception.domain.NotFoundException
-import com.example.pimcoreapi.shared.exception.domain.ObjectNullException
 import lombok.extern.slf4j.Slf4j
-import org.spockframework.spring.SpringBean
-import org.springframework.boot.test.context.SpringBootTest
 import spock.lang.Specification
 import spock.lang.Subject
-
-import java.time.LocalDateTime
 
 @Slf4j
 class DeleteChannelUserCaseTest extends Specification {
@@ -21,7 +15,7 @@ class DeleteChannelUserCaseTest extends Specification {
     DeleteChannelUserCase subject
     ChannelServicePort channelServicePort
 
-    void setup () {
+    void setup() {
         this.channelServicePort = Mock(ChannelServicePortAdapter.class)
         this.subject = new DeleteChannelUserCase(this.channelServicePort)
     }

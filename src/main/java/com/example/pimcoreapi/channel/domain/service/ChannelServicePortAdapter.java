@@ -8,7 +8,6 @@ import com.example.pimcoreapi.shared.exception.domain.IsEmptyException;
 import com.example.pimcoreapi.shared.exception.domain.NotFoundException;
 import com.example.pimcoreapi.shared.exception.domain.ObjectNullException;
 import com.example.pimcoreapi.shared.utils.Utils;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

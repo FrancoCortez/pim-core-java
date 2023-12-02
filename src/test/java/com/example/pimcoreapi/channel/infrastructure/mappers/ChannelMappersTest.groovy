@@ -6,7 +6,6 @@ import com.example.pimcoreapi.channel.infrastructure.entities.Channel
 import com.example.pimcoreapi.shared.exception.infreastructure.IsEmptyException
 import com.example.pimcoreapi.shared.exception.infreastructure.ObjectNullException
 import lombok.extern.slf4j.Slf4j
-import org.springframework.boot.test.context.SpringBootTest
 import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Subject
@@ -33,7 +32,7 @@ class ChannelMappersTest extends Specification {
     @Timeout(value = 100, unit = TimeUnit.MILLISECONDS)
     def "toModelCreate: should mapper channel with valid input and return Channel entity object"() {
         given:
-        def createChannelDtoMock = new CreateChannelDto([ name: this.nameChannelMock])
+        def createChannelDtoMock = new CreateChannelDto([name: this.nameChannelMock])
         when:
         def result = this.subject.toModelCreate(createChannelDtoMock, this.codeChannelMock)
         then:
@@ -68,7 +67,7 @@ class ChannelMappersTest extends Specification {
     @Timeout(value = 100, unit = TimeUnit.MILLISECONDS)
     def "toModelCreate: should throw an exception when given a CreateChannelDto with a name is empty"() {
         given:
-        def createChannelDtoMock = new CreateChannelDto([ name: ""])
+        def createChannelDtoMock = new CreateChannelDto([name: ""])
         when:
         this.subject.toModelCreate(createChannelDtoMock, "")
         then:
@@ -80,7 +79,7 @@ class ChannelMappersTest extends Specification {
     @Timeout(value = 100, unit = TimeUnit.MILLISECONDS)
     def "toResource: should mapper channel with valid input and return ResourceChannelDto then entity object"() {
         given:
-        def resourceChannelDtoMock = new ResourceChannelDto([ name: this.nameChannelMock, code: this.codeChannelMock])
+        def resourceChannelDtoMock = new ResourceChannelDto([name: this.nameChannelMock, code: this.codeChannelMock])
         when:
         def result = this.subject.toResource(this.entityMock)
         then:
@@ -91,7 +90,7 @@ class ChannelMappersTest extends Specification {
     @Timeout(value = 100, unit = TimeUnit.MILLISECONDS)
     def "toResource: should mapper channel with invalid input null and return null object"() {
         given:
-        Channel entityMockObject =  null
+        Channel entityMockObject = null
         when:
         def result = this.subject.toResource(entityMockObject)
         then:
