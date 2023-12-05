@@ -35,4 +35,8 @@ public class ChannelServicePortAdapter implements ChannelServicePort {
         if (channelDto == null) throw new NotFoundException(id, "Channel");
         this.channelPersistencePort.deleteById(id);
     }
+
+    public void deleteAll() {
+        this.channelPersistencePort.deleteAll();
+    }
 }

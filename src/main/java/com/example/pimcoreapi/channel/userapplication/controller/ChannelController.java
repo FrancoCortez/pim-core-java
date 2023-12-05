@@ -28,4 +28,10 @@ public class ChannelController {
         this.deleteChannelUserCase.deleteById(id);
         return ResponseEntity.ok().build();
     }
+
+    @DeleteMapping("/all/delete")
+    public ResponseEntity<Void> deleteAll() {
+        this.deleteChannelUserCase.deleteAll();
+        return ResponseEntity.ok().build();
+    }
 }

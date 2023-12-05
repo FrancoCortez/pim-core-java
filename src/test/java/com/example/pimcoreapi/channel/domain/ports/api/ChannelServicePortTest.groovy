@@ -126,5 +126,12 @@ class ChannelServicePortTest extends Specification {
         exception.message == "The Channel object for id Not Valid Id not found"
     }
 
+    @Timeout(value = 100, unit = TimeUnit.MILLISECONDS)
+    def "should delete all channel"() {
+        when:
+        this.subject.deleteAll()
+        then:
+        1 * channelPersistencePortMock.deleteAll()
+    }
 
 }

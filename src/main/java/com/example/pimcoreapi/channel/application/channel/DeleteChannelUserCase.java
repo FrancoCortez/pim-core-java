@@ -12,4 +12,8 @@ public class DeleteChannelUserCase {
     public void deleteById(String id) {
         this.channelServicePort.deleteById(id);
     }
+
+    public void deleteAll() {
+        this.channelServicePort.deleteAll();
+    }
 }

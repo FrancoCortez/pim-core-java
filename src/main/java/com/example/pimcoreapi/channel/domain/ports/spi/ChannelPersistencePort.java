@@ -9,4 +9,6 @@ public interface ChannelPersistencePort {
     ResourceChannelDto findById(String id);
 
     void deleteById(String id);
+
+    void deleteAll();
 }

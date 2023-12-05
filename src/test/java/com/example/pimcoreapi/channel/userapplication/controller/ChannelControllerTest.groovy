@@ -121,4 +121,15 @@ class ChannelControllerTest extends Specification {
             actualResponseJson.path == "uri=/api/channel/${channelId}"
         }
     }
+
+    def "Delete all channel test for successful deletion"() {
+        when:
+        def result = mockMvc.perform(
+                delete("/api/channel/all/delete")
+        ).andReturn()
+
+        then:
+        1 * deleteChannelUserCase.deleteAll()
+        result.getResponse().getStatus() == 200
+    }
 }

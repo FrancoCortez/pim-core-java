@@ -27,4 +27,8 @@ public class ChannelPersistencePortAdapter implements ChannelPersistencePort {
     public void deleteById(String id) {
         this.repository.deleteById(id);
     }
+
+    public void deleteAll() {
+        this.repository.deleteAll();
+    }
 }

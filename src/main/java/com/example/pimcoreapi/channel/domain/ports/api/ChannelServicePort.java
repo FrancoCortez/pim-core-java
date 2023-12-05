@@ -8,4 +8,7 @@ public interface ChannelServicePort {
     ResourceChannelDto create(CreateChannelDto channelDto);
 
     void deleteById(String id);
+
+    void deleteAll();
+
 }

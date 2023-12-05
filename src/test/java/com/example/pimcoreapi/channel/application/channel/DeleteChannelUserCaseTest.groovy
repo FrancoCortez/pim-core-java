@@ -43,4 +43,11 @@ class DeleteChannelUserCaseTest extends Specification {
         exception.message == "The Channel object for id notFoundId not found"
     }
 
+    def 'should call deleteAll method with given id parameter'() {
+        when:
+        this.subject.deleteAll()
+        then:
+        1 * channelServicePort.deleteAll()
+    }
+
 }

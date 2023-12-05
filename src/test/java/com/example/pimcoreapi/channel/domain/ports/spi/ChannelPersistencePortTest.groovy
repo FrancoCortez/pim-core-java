@@ -84,4 +84,12 @@ class ChannelPersistencePortTest extends Specification {
         then:
         1 * repository.deleteById(id)
     }
+
+    def "deleteAll: should delete an existing all channel"() {
+        when:
+        subject.deleteAll()
+        then:
+        1 * repository.deleteAll()
+    }
+
 }
