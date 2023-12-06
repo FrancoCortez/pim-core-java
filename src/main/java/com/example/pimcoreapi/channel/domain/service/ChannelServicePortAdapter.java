@@ -39,4 +39,11 @@ public class ChannelServicePortAdapter implements ChannelServicePort {
     public void deleteAll() {
         this.channelPersistencePort.deleteAll();
     }
+
+    public ResourceChannelDto findById(String id) {
+        if (id.isEmpty() || id.isBlank()) throw new IsEmptyException("id", "Search Channel");
+        var channelDto = this.channelPersistencePort.findById(id);
+        if (channelDto == null) throw new NotFoundException(id, "Channel");
+        return channelDto;
+    }
 }

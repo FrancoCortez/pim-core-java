@@ -2,9 +2,11 @@ package com.example.pimcoreapi.channel.userapplication.controller
 
 import com.example.pimcoreapi.channel.application.channel.CreateChannelUserCase
 import com.example.pimcoreapi.channel.application.channel.DeleteChannelUserCase
+import com.example.pimcoreapi.channel.application.channel.FindChannelUserCase
 import com.example.pimcoreapi.channel.domain.data.channel.CreateChannelDto
 import com.example.pimcoreapi.channel.domain.data.channel.ResourceChannelDto
 import com.example.pimcoreapi.shared.exception.data.ErrorResponse
+import com.example.pimcoreapi.shared.exception.domain.IsEmptyException
 import com.example.pimcoreapi.shared.exception.domain.NotFoundException
 import com.example.pimcoreapi.shared.exception.domain.ObjectNullException
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -18,8 +20,7 @@ import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import spock.lang.Specification
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 
 //import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*
 
@@ -32,6 +33,8 @@ class ChannelControllerTest extends Specification {
     CreateChannelUserCase createChannelUserCase = Mock(CreateChannelUserCase)
     @SpringBean
     DeleteChannelUserCase deleteChannelUserCase = Mock(DeleteChannelUserCase)
+    @SpringBean
+    FindChannelUserCase findChannelUserCase = Mock(FindChannelUserCase)
     @Autowired
     MockMvc mockMvc
     ObjectMapper objectMapper = new ObjectMapper()
@@ -105,7 +108,6 @@ class ChannelControllerTest extends Specification {
         given:
         String channelId = "nonExistentChannelId"
         1 * deleteChannelUserCase.deleteById(channelId) >> { throw new NotFoundException('id', 'Channel') }
-
         when:
         def result = mockMvc.perform(
                 delete("/api/channel/${channelId}")
@@ -131,5 +133,69 @@ class ChannelControllerTest extends Specification {
         then:
         1 * deleteChannelUserCase.deleteAll()
         result.getResponse().getStatus() == 200
+    }
+
+    def "findById channel test for successful search"() {
+        given:
+        String channelId = "someChannelId"
+        def expectedResponse = new ResourceChannelDto([name: 'Test', code: 'test', id: 'id'])
+        when:
+        def result = mockMvc.perform(
+                get("/api/channel/${channelId}")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andReturn()
+
+        then:
+        1 * this.findChannelUserCase.findById(channelId) >> expectedResponse
+        and:
+        result.getResponse().getStatus() == 200
+        def actualResponseJson = objectMapper.readValue(result.getResponse().getContentAsString(), ResourceChannelDto.class)
+        verifyAll {
+            actualResponseJson.name == expectedResponse.name
+            actualResponseJson.code == expectedResponse.code
+            actualResponseJson.id == expectedResponse.id
+        }
+    }
+
+    def "findById type channel test for error with a valid input and returning an object as a 4 response from the channel"() {
+        given:
+        String channelId = "someChannelId"
+        when:
+        def result = mockMvc.perform(
+                get("/api/channel/${channelId}")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andReturn()
+        then:
+        1 * findChannelUserCase.findById(channelId) >> { throw new NotFoundException(channelId, "Channel") }
+        and:
+        result.getResponse().getStatus() == 404
+        def actualResponseJson = objectMapper.readValue(result.getResponse().getContentAsString(), ErrorResponse.class)
+        verifyAll() {
+            actualResponseJson.status == 404
+            actualResponseJson.error == 'Not Found'
+            actualResponseJson.message == 'Validation failed'
+            actualResponseJson.path == "uri=/api/channel/${channelId}"
+        }
+    }
+
+    def "findById type channel test for error with a valid input and returning an object"() {
+        given:
+        String channelId = "empty"
+        when:
+        def result = mockMvc.perform(
+                get("/api/channel/${channelId}")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andReturn()
+        then:
+        1 * findChannelUserCase.findById(channelId) >> { throw new IsEmptyException("id", "Search Channel") }
+        and:
+        result.getResponse().getStatus() == 400
+        def actualResponseJson = objectMapper.readValue(result.getResponse().getContentAsString(), ErrorResponse.class)
+        verifyAll() {
+            actualResponseJson.status == 400
+            actualResponseJson.error == 'Bad Request'
+            actualResponseJson.message == 'Validation failed'
+            actualResponseJson.path == "uri=/api/channel/${channelId}"
+        }
     }
 }

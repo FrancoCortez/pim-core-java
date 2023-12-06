@@ -32,7 +32,7 @@ class ChannelServicePortTest extends Specification {
     }
 
     @Timeout(value = 100, unit = TimeUnit.MILLISECONDS)
-    def "should generate code and call create method with correct parameters"() {
+    def "create: should generate code and call create method with correct parameters"() {
         given:
         def channelDto = CreateChannelDto.builder()
                 .name("Test Channel")
@@ -52,7 +52,7 @@ class ChannelServicePortTest extends Specification {
     }
 
     @Timeout(value = 100, unit = TimeUnit.MILLISECONDS)
-    def "should throw an exception when given a CreateChannelDto with a null"() {
+    def "create: should throw an exception when given a CreateChannelDto with a null"() {
         given:
         def createChannelDtoMock = null
         when:
@@ -64,7 +64,7 @@ class ChannelServicePortTest extends Specification {
     }
 
     @Timeout(value = 100, unit = TimeUnit.MILLISECONDS)
-    def "should throw an exception when given a CreateChannelDto with a name null"() {
+    def "create: should throw an exception when given a CreateChannelDto with a name null"() {
         given:
         def createChannelDtoMock = new CreateChannelDto()
         when:
@@ -77,7 +77,7 @@ class ChannelServicePortTest extends Specification {
 
 
     @Timeout(value = 100, unit = TimeUnit.MILLISECONDS)
-    def "should throw an exception when given a CreateChannelDto with a name is empty"() {
+    def "create: should throw an exception when given a CreateChannelDto with a name is empty"() {
         given:
         def createChannelDtoMock = new CreateChannelDto([name: ""])
         when:
@@ -89,7 +89,7 @@ class ChannelServicePortTest extends Specification {
     }
 
     @Timeout(value = 100, unit = TimeUnit.MILLISECONDS)
-    def "should delete a channel with a valid id"() {
+    def "deleteById: should delete a channel with a valid id"() {
         given:
         def id = "validId"
         def channelDto = new ResourceChannelDto(id: id, name: "Test Channel", code: "TC", createdBy: "User", createdDate: LocalDateTime.now(), lastModifiedBy: "User", lastModifiedDate: LocalDateTime.now())
@@ -101,7 +101,7 @@ class ChannelServicePortTest extends Specification {
     }
 
     @Timeout(value = 100, unit = TimeUnit.MILLISECONDS)
-    def "should delete a channel with a null id"() {
+    def "deleteById: should delete a channel with a null id"() {
         given:
         def id = null
         when:
@@ -113,7 +113,7 @@ class ChannelServicePortTest extends Specification {
     }
 
     @Timeout(value = 100, unit = TimeUnit.MILLISECONDS)
-    def "should delete a channel with a invalid id"() {
+    def "deleteById: should delete a channel with a invalid id"() {
         given:
         def id = "Not Valid Id"
         when:
@@ -127,11 +127,58 @@ class ChannelServicePortTest extends Specification {
     }
 
     @Timeout(value = 100, unit = TimeUnit.MILLISECONDS)
-    def "should delete all channel"() {
+    def "deleteAll: should delete all channel"() {
         when:
         this.subject.deleteAll()
         then:
         1 * channelPersistencePortMock.deleteAll()
     }
 
+    @Timeout(value = 100, unit = TimeUnit.MILLISECONDS)
+    def "findById: should find a channel with a valid id"() {
+        given:
+        def id = "validId"
+        def expectDto = new ResourceChannelDto([id: 'validId', code: 'code', name: 'name', createdBy: 'legacy', lastModifiedBy: 'legacy', createdDate: LocalDateTime.now(), lastModifiedDate: LocalDateTime.now()])
+        when:
+        def result = this.subject.findById(id)
+        then:
+        1 * channelPersistencePortMock.findById(id) >> expectDto
+        and:
+        verifyAll(result) {
+            id == expectDto.id
+            code == expectDto.code
+            name == expectDto.name
+            createdBy == expectDto.createdBy
+            lastModifiedBy == expectDto.lastModifiedBy
+            lastModifiedDate == expectDto.lastModifiedDate
+            createdDate == expectDto.createdDate
+        }
+
+    }
+
+    @Timeout(value = 100, unit = TimeUnit.MILLISECONDS)
+    def "findById: should find a channel with a empty id"() {
+        given:
+        def id = ""
+        when:
+        this.subject.findById(id)
+        then:
+        def exception = thrown(Exception)
+        exception instanceof IsEmptyException
+        exception.message == "The argument: id is empty for object: Search Channel"
+    }
+
+    @Timeout(value = 100, unit = TimeUnit.MILLISECONDS)
+    def "findById: should find a channel with a invalid id"() {
+        given:
+        def id = "invalid"
+        when:
+        def result = this.subject.findById(id)
+        then:
+        1 * channelPersistencePortMock.findById(id) >> null
+        and:
+        def exception = thrown(Exception)
+        exception instanceof NotFoundException
+        exception.message == "The Channel object for id invalid not found"
+    }
 }

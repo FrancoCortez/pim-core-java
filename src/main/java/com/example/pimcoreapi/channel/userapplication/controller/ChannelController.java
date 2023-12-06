@@ -2,6 +2,7 @@ package com.example.pimcoreapi.channel.userapplication.controller;
 
 import com.example.pimcoreapi.channel.application.channel.CreateChannelUserCase;
 import com.example.pimcoreapi.channel.application.channel.DeleteChannelUserCase;
+import com.example.pimcoreapi.channel.application.channel.FindChannelUserCase;
 import com.example.pimcoreapi.channel.domain.data.channel.CreateChannelDto;
 import com.example.pimcoreapi.channel.domain.data.channel.ResourceChannelDto;
 import jakarta.validation.Valid;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 public class ChannelController {
     private final CreateChannelUserCase createChannelUserCase;
     private final DeleteChannelUserCase deleteChannelUserCase;
+    private final FindChannelUserCase findChannelUserCase;
 
     @PostMapping
     public ResponseEntity<ResourceChannelDto> create(@Valid @RequestBody CreateChannelDto channelDto) {
@@ -33,5 +35,10 @@ public class ChannelController {
     public ResponseEntity<Void> deleteAll() {
         this.deleteChannelUserCase.deleteAll();
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ResourceChannelDto> findById(@PathVariable String id) {
+        return ResponseEntity.ok(this.findChannelUserCase.findById(id));
     }
 }

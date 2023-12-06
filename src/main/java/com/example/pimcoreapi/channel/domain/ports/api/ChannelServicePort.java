@@ -11,4 +11,5 @@ public interface ChannelServicePort {
 
     void deleteAll();
 
+    ResourceChannelDto findById(String id);
 }
