@@ -11,6 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @Slf4j
@@ -40,5 +42,10 @@ public class ChannelController {
     @GetMapping("/{id}")
     public ResponseEntity<ResourceChannelDto> findById(@PathVariable String id) {
         return ResponseEntity.ok(this.findChannelUserCase.findById(id));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ResourceChannelDto>> findAll() {
+        return ResponseEntity.ok(this.findChannelUserCase.findAll());
     }
 }

@@ -8,6 +8,9 @@ import com.example.pimcoreapi.channel.infrastructure.repository.ChannelRepositor
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RequiredArgsConstructor
 @Component
 public class ChannelPersistencePortAdapter implements ChannelPersistencePort {
@@ -30,5 +33,11 @@ public class ChannelPersistencePortAdapter implements ChannelPersistencePort {
 
     public void deleteAll() {
         this.repository.deleteAll();
+    }
+
+    public List<ResourceChannelDto> findAll() {
+        return this.repository.findAll().stream()
+                .map(this.mapper::toResource)
+                .collect(Collectors.toList());
     }
 }

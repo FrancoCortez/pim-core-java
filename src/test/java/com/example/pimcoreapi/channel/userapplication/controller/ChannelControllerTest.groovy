@@ -9,6 +9,7 @@ import com.example.pimcoreapi.shared.exception.data.ErrorResponse
 import com.example.pimcoreapi.shared.exception.domain.IsEmptyException
 import com.example.pimcoreapi.shared.exception.domain.NotFoundException
 import com.example.pimcoreapi.shared.exception.domain.ObjectNullException
+import com.fasterxml.jackson.databind.JavaType
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import lombok.extern.slf4j.Slf4j
@@ -197,5 +198,33 @@ class ChannelControllerTest extends Specification {
             actualResponseJson.message == 'Validation failed'
             actualResponseJson.path == "uri=/api/channel/${channelId}"
         }
+    }
+
+    def "findAll channel test for successful search"() {
+        given:
+        def expectedResponse = [
+                new ResourceChannelDto([name: 'Test', code: 'test', id: 'id']),
+                new ResourceChannelDto([name: 'Test1', code: 'test1', id: 'id1']),
+                new ResourceChannelDto([name: 'Test2', code: 'test2', id: 'id2'])
+        ]
+        when:
+        def result = mockMvc.perform(
+                get("/api/channel")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andReturn()
+
+        then:
+        1 * this.findChannelUserCase.findAll() >> expectedResponse
+        and:
+        result.getResponse().getStatus() == 200
+        JavaType type = objectMapper.getTypeFactory().constructCollectionType(List.class, ResourceChannelDto.class)
+        List<ResourceChannelDto> actualResponseJson = objectMapper.readValue(result.getResponse().getContentAsString(), type)
+        actualResponseJson.size() == expectedResponse.size()
+        expectedResponse.eachWithIndex { expected, index ->
+            actualResponseJson[index].name == expected.name
+            actualResponseJson[index].code == expected.code
+            actualResponseJson[index].id == expected.id
+        }
+
     }
 }

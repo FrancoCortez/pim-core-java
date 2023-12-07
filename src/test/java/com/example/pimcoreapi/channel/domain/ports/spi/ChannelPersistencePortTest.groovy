@@ -92,4 +92,33 @@ class ChannelPersistencePortTest extends Specification {
         1 * repository.deleteAll()
     }
 
+    def "findAll: should return List ResourceChannelDto"() {
+        given:
+        def expectedResponse = [
+                new ResourceChannelDto([name: 'Test', code: 'test', id: 'id']),
+                new ResourceChannelDto([name: 'Test1', code: 'test1', id: 'id1']),
+                new ResourceChannelDto([name: 'Test2', code: 'test2', id: 'id2'])
+        ]
+        def mockEntity = [
+                new Channel([name: 'Test', code: 'test', id: 'id']),
+                new Channel([name: 'Test1', code: 'test1', id: 'id1']),
+                new Channel([name: 'Test2', code: 'test2', id: 'id2'])
+        ]
+        when:
+        def result = subject.findAll()
+        then:
+        1 * this.repository.findAll() >> mockEntity
+        mockEntity.eachWithIndex { entity, index ->
+            1 * this.mapper.toResource(entity) >> expectedResponse[index]
+        }
+
+        and:
+        result.size() == expectedResponse.size()
+        expectedResponse.eachWithIndex { expected, index ->
+            result[index].name == expected.name
+            result[index].code == expected.code
+            result[index].id == expected.id
+        }
+    }
+
 }

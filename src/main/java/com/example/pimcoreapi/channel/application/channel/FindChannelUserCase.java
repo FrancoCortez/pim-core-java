@@ -5,6 +5,8 @@ import com.example.pimcoreapi.channel.domain.ports.api.ChannelServicePort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 @Component
 @RequiredArgsConstructor
 public class FindChannelUserCase {
@@ -12,5 +14,9 @@ public class FindChannelUserCase {
 
     public ResourceChannelDto findById(String id) {
         return this.channelServicePort.findById(id);
+    }
+
+    public List<ResourceChannelDto> findAll() {
+        return this.channelServicePort.findAll();
     }
 }

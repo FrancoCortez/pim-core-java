@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -45,5 +47,9 @@ public class ChannelServicePortAdapter implements ChannelServicePort {
         var channelDto = this.channelPersistencePort.findById(id);
         if (channelDto == null) throw new NotFoundException(id, "Channel");
         return channelDto;
+    }
+
+    public List<ResourceChannelDto> findAll() {
+        return this.channelPersistencePort.findAll();
     }
 }

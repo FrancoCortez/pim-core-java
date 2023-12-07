@@ -173,12 +173,34 @@ class ChannelServicePortTest extends Specification {
         given:
         def id = "invalid"
         when:
-        def result = this.subject.findById(id)
+        this.subject.findById(id)
         then:
         1 * channelPersistencePortMock.findById(id) >> null
         and:
         def exception = thrown(Exception)
         exception instanceof NotFoundException
         exception.message == "The Channel object for id invalid not found"
+    }
+
+    @Timeout(value = 100, unit = TimeUnit.MILLISECONDS)
+    def "findAll: should find all a channel"() {
+        given:
+        def expectedResponse = [
+                new ResourceChannelDto([name: 'Test', code: 'test', id: 'id']),
+                new ResourceChannelDto([name: 'Test1', code: 'test1', id: 'id1']),
+                new ResourceChannelDto([name: 'Test2', code: 'test2', id: 'id2'])
+        ]
+        when:
+        def result = this.subject.findAll()
+        then:
+        1 * channelPersistencePortMock.findAll() >> expectedResponse
+        and:
+        result.size() == expectedResponse.size()
+        expectedResponse.eachWithIndex { expected, index ->
+            result[index].name == expected.name
+            result[index].code == expected.code
+            result[index].id == expected.id
+        }
+
     }
 }

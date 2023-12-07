@@ -68,4 +68,24 @@ class FindChannelUserCaseTest extends Specification {
         exception instanceof NotFoundException
         exception.message == "The Channel object for id notFoundId not found"
     }
+
+    def 'findAll: should call findAll method'() {
+        given:
+        def expectedResponse = [
+                new ResourceChannelDto([name: 'Test', code: 'test', id: 'id']),
+                new ResourceChannelDto([name: 'Test1', code: 'test1', id: 'id1']),
+                new ResourceChannelDto([name: 'Test2', code: 'test2', id: 'id2'])
+        ]
+        when:
+        def result = this.subject.findAll()
+        then:
+        1 * channelServicePort.findAll() >> expectedResponse
+        and:
+        result.size() == expectedResponse.size()
+        expectedResponse.eachWithIndex { expected, index ->
+            result[index].name == expected.name
+            result[index].code == expected.code
+            result[index].id == expected.id
+        }
+    }
 }
