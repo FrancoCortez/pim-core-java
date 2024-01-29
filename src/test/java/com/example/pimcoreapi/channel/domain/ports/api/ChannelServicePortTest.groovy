@@ -2,6 +2,7 @@ package com.example.pimcoreapi.channel.domain.ports.api
 
 import com.example.pimcoreapi.channel.domain.data.channel.CreateChannelDto
 import com.example.pimcoreapi.channel.domain.data.channel.ResourceChannelDto
+import com.example.pimcoreapi.channel.domain.data.channel.UpdateChannelDto
 import com.example.pimcoreapi.channel.domain.ports.spi.ChannelPersistencePort
 import com.example.pimcoreapi.channel.domain.service.ChannelServicePortAdapter
 import com.example.pimcoreapi.channel.infrastructure.adapters.ChannelPersistencePortAdapter
@@ -52,40 +53,19 @@ class ChannelServicePortTest extends Specification {
     }
 
     @Timeout(value = 100, unit = TimeUnit.MILLISECONDS)
-    def "create: should throw an exception when given a CreateChannelDto with a null"() {
+    def "create: should throw an exception when given a CreateChannelDto with a error"() {
         given:
-        def createChannelDtoMock = null
+        def createChannelDtoMock = channel
         when:
         this.subject.create(createChannelDtoMock)
         then:
-        def exception = thrown(Exception)
-        exception instanceof ObjectNullException
-        exception.message == "The object: Channel Created is null"
-    }
-
-    @Timeout(value = 100, unit = TimeUnit.MILLISECONDS)
-    def "create: should throw an exception when given a CreateChannelDto with a name null"() {
-        given:
-        def createChannelDtoMock = new CreateChannelDto()
-        when:
-        this.subject.create(createChannelDtoMock)
-        then:
-        def exception = thrown(Exception)
-        exception instanceof ObjectNullException
-        exception.message == "The object: Name is null"
-    }
-
-
-    @Timeout(value = 100, unit = TimeUnit.MILLISECONDS)
-    def "create: should throw an exception when given a CreateChannelDto with a name is empty"() {
-        given:
-        def createChannelDtoMock = new CreateChannelDto([name: ""])
-        when:
-        this.subject.create(createChannelDtoMock)
-        then:
-        def exception = thrown(Exception)
-        exception instanceof IsEmptyException
-        exception.message == "The argument: Name is empty for object: Created Channel"
+        def exception = thrown(expectedException.getClass() as Class<Throwable>)
+        exception.message == message
+        where:
+        channel                          | expectedException                               | message
+        null                             | new ObjectNullException("Channel")              | "The object: Channel Created is null"
+        new CreateChannelDto()           | new ObjectNullException("Name")                 | "The object: Name is null"
+        new CreateChannelDto([name: ""]) | new IsEmptyException("Name", "Created Channel") | "The argument: Name is empty for object: Created Channel"
     }
 
     @Timeout(value = 100, unit = TimeUnit.MILLISECONDS)
@@ -138,7 +118,7 @@ class ChannelServicePortTest extends Specification {
     def "findById: should find a channel with a valid id"() {
         given:
         def id = "validId"
-        def expectDto = new ResourceChannelDto([id: 'validId', code: 'code', name: 'name', createdBy: 'legacy', lastModifiedBy: 'legacy', createdDate: LocalDateTime.now(), lastModifiedDate: LocalDateTime.now()])
+        def expectDto = new ResourceChannelDto([id: "validId", code: "code", name: "name", createdBy: "legacy", lastModifiedBy: "legacy", createdDate: LocalDateTime.now(), lastModifiedDate: LocalDateTime.now()])
         when:
         def result = this.subject.findById(id)
         then:
@@ -186,9 +166,9 @@ class ChannelServicePortTest extends Specification {
     def "findAll: should find all a channel"() {
         given:
         def expectedResponse = [
-                new ResourceChannelDto([name: 'Test', code: 'test', id: 'id']),
-                new ResourceChannelDto([name: 'Test1', code: 'test1', id: 'id1']),
-                new ResourceChannelDto([name: 'Test2', code: 'test2', id: 'id2'])
+                new ResourceChannelDto([name: "Test", code: "test", id: "id"]),
+                new ResourceChannelDto([name: "Test1", code: "test1", id: "id1"]),
+                new ResourceChannelDto([name: "Test2", code: "test2", id: "id2"])
         ]
         when:
         def result = this.subject.findAll()
@@ -201,6 +181,41 @@ class ChannelServicePortTest extends Specification {
             result[index].code == expected.code
             result[index].id == expected.id
         }
+
+    }
+
+    def "updateById: should update one channel with valid input"() {
+        given:
+        def channelDto = new UpdateChannelDto(name: "Test Channel")
+        def id = "1"
+        def expectedResourceChannelDto = new ResourceChannelDto(id: id, name: "Test Channel", code: "TC", createdBy: "Test", createdDate: LocalDateTime.now(), lastModifiedBy: "Test", lastModifiedDate: LocalDateTime.now())
+        when:
+        def result = this.subject.updateById(channelDto, id)
+        then:
+        1 * channelPersistencePortMock.findById(id) >> expectedResourceChannelDto
+        1 * utilsMock.generateCode(_) >> "TC"
+        1 * channelPersistencePortMock.updateById(_, _, _) >> expectedResourceChannelDto
+        and:
+        result != null
+        result == expectedResourceChannelDto
+    }
+
+    def "updateById: should update one channel with invalid and throw exception"() {
+        given:
+        def channelDto = inputDto
+        def id = idMock
+        when:
+        this.subject.updateById(channelDto, id)
+        then:
+        def exception = thrown(expectedException.getClass() as Class<Throwable>)
+        exception.message == expectedMessage
+        where:
+        inputDto                           | expectedException                               | expectedMessage                                           | idMock
+        new UpdateChannelDto(name: null)   | new ObjectNullException("Name")                 | "The object: Name is null"                                | "1"
+        null                               | new ObjectNullException("Channel Created")      | "The object: Channel Created is null"                     | "1"
+        new UpdateChannelDto(name: "")     | new IsEmptyException("Name", "Created Channel") | "The argument: Name is empty for object: Created Channel" | "1"
+        new UpdateChannelDto(name: "test") | new IsEmptyException("id", "Search Channel")    | "The argument: id is empty for object: Search Channel"    | ""
+        new UpdateChannelDto(name: "test") | new NotFoundException("1", "Channel")           | "The Channel object for id 1 not found"                   | "1"
 
     }
 }

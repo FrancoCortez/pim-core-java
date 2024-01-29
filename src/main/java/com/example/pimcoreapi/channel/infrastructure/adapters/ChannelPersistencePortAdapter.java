@@ -2,6 +2,7 @@ package com.example.pimcoreapi.channel.infrastructure.adapters;
 
 import com.example.pimcoreapi.channel.domain.data.channel.CreateChannelDto;
 import com.example.pimcoreapi.channel.domain.data.channel.ResourceChannelDto;
+import com.example.pimcoreapi.channel.domain.data.channel.UpdateChannelDto;
 import com.example.pimcoreapi.channel.domain.ports.spi.ChannelPersistencePort;
 import com.example.pimcoreapi.channel.infrastructure.mappers.ChannelMappers;
 import com.example.pimcoreapi.channel.infrastructure.repository.ChannelRepository;
@@ -39,5 +40,10 @@ public class ChannelPersistencePortAdapter implements ChannelPersistencePort {
         return this.repository.findAll().stream()
                 .map(this.mapper::toResource)
                 .collect(Collectors.toList());
+    }
+
+    public ResourceChannelDto updateById(UpdateChannelDto channelDto, String id, String code) {
+        var entity = this.mapper.toModelCreateUpdate(channelDto, code, id);
+        return this.mapper.toResource(this.repository.save(entity));
     }
 }

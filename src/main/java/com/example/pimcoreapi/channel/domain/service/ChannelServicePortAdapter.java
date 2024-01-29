@@ -2,6 +2,7 @@ package com.example.pimcoreapi.channel.domain.service;
 
 import com.example.pimcoreapi.channel.domain.data.channel.CreateChannelDto;
 import com.example.pimcoreapi.channel.domain.data.channel.ResourceChannelDto;
+import com.example.pimcoreapi.channel.domain.data.channel.UpdateChannelDto;
 import com.example.pimcoreapi.channel.domain.ports.api.ChannelServicePort;
 import com.example.pimcoreapi.channel.domain.ports.spi.ChannelPersistencePort;
 import com.example.pimcoreapi.shared.exception.domain.IsEmptyException;
@@ -23,10 +24,7 @@ public class ChannelServicePortAdapter implements ChannelServicePort {
     private final Utils utils;
 
     public ResourceChannelDto create(CreateChannelDto channelDto) {
-        if (channelDto == null) throw new ObjectNullException("Channel Created");
-        if (channelDto.getName() == null) throw new ObjectNullException("Name");
-        if (channelDto.getName().isEmpty() || channelDto.getName().isBlank())
-            throw new IsEmptyException("Name", "Created Channel");
+        this.validateCreateInput(channelDto);
         String code = this.utils.generateCode(channelDto.getName());
         return this.channelPersistencePort.create(channelDto, code);
     }
@@ -51,5 +49,28 @@ public class ChannelServicePortAdapter implements ChannelServicePort {
 
     public List<ResourceChannelDto> findAll() {
         return this.channelPersistencePort.findAll();
+    }
+
+    public ResourceChannelDto updateById(UpdateChannelDto channelDto, String id) {
+        validateUpdateInput(channelDto, id);
+        var findChannelDto = this.channelPersistencePort.findById(id);
+        if (findChannelDto == null) throw new NotFoundException(id, "Channel");
+        var code = this.utils.generateCode(channelDto.getName());
+        return this.channelPersistencePort.updateById(channelDto, id, code);
+    }
+
+    private void validateCreateInput(CreateChannelDto channelDto) {
+        if (channelDto == null) throw new ObjectNullException("Channel Created");
+        if (channelDto.getName() == null) throw new ObjectNullException("Name");
+        if (channelDto.getName().isEmpty() || channelDto.getName().isBlank())
+            throw new IsEmptyException("Name", "Created Channel");
+    }
+
+    private void validateUpdateInput(UpdateChannelDto channelDto, String id) {
+        if (channelDto == null) throw new ObjectNullException("Channel Created");
+        if (channelDto.getName() == null) throw new ObjectNullException("Name");
+        if (channelDto.getName().isEmpty() || channelDto.getName().isBlank())
+            throw new IsEmptyException("Name", "Created Channel");
+        if (id.isEmpty() || id.isBlank()) throw new IsEmptyException("id", "Search Channel");
     }
 }

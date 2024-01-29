@@ -23,10 +23,10 @@ class FindChannelUserCaseTest extends Specification {
         this.subject = new FindChannelUserCase(this.channelServicePort)
     }
 
-    def 'findById: should call findById method with given id parameter'() {
+    def "findById: should call findById method with given id parameter"() {
         given:
-        def someId = 'someId'
-        ResourceChannelDto expectedResourceChannelDto = new ResourceChannelDto(id: '1', name: 'Test Channel', code: 'TC', createdBy: 'Test', createdDate: LocalDateTime.now(), lastModifiedBy: 'Test', lastModifiedDate: LocalDateTime.now())
+        def someId = "someId"
+        ResourceChannelDto expectedResourceChannelDto = new ResourceChannelDto(id: "1", name: "Test Channel", code: "TC", createdBy: "Test", createdDate: LocalDateTime.now(), lastModifiedBy: "Test", lastModifiedDate: LocalDateTime.now())
         when:
         def result = this.subject.findById(someId)
         then:
@@ -43,9 +43,9 @@ class FindChannelUserCaseTest extends Specification {
         }
     }
 
-    def 'findById: should call findById method with given invalid id parameter null IsEmptyException'() {
+    def "findById: should call findById method with given invalid id parameter null IsEmptyException"() {
         given:
-        def someId = 'null'
+        def someId = "null"
         when:
         this.subject.findById(someId)
         then:
@@ -56,9 +56,9 @@ class FindChannelUserCaseTest extends Specification {
         exception.message == "The argument: id is empty for object: Search Channel"
     }
 
-    def 'findById: should call findById method with given invalid id parameter null '() {
+    def "findById: should call findById method with given invalid id parameter null "() {
         given:
-        def someId = 'notFoundId'
+        def someId = "notFoundId"
         when:
         this.subject.findById(someId)
         then:
@@ -69,12 +69,12 @@ class FindChannelUserCaseTest extends Specification {
         exception.message == "The Channel object for id notFoundId not found"
     }
 
-    def 'findAll: should call findAll method'() {
+    def "findAll: should call findAll method"() {
         given:
         def expectedResponse = [
-                new ResourceChannelDto([name: 'Test', code: 'test', id: 'id']),
-                new ResourceChannelDto([name: 'Test1', code: 'test1', id: 'id1']),
-                new ResourceChannelDto([name: 'Test2', code: 'test2', id: 'id2'])
+                new ResourceChannelDto([name: "Test", code: "test", id: "id"]),
+                new ResourceChannelDto([name: "Test1", code: "test1", id: "id1"]),
+                new ResourceChannelDto([name: "Test2", code: "test2", id: "id2"])
         ]
         when:
         def result = this.subject.findAll()

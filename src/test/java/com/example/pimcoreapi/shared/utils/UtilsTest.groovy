@@ -18,8 +18,8 @@ class UtilsTest extends Specification {
         resultInputTest == expetText
         where:
         inputText             | expetText
-        'París'               | 'paris'
-        'Cómodo Coso Testing' | 'comodoCosoTesting'
-        'Sobrio Loco'         | 'sobrioLoco'
+        "París"               | "paris"
+        "Cómodo Coso Testing" | "comodoCosoTesting"
+        "Sobrio Loco"         | "sobrioLoco"
     }
 }

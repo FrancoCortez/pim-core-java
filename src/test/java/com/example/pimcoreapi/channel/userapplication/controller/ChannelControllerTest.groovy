@@ -3,8 +3,10 @@ package com.example.pimcoreapi.channel.userapplication.controller
 import com.example.pimcoreapi.channel.application.channel.CreateChannelUserCase
 import com.example.pimcoreapi.channel.application.channel.DeleteChannelUserCase
 import com.example.pimcoreapi.channel.application.channel.FindChannelUserCase
+import com.example.pimcoreapi.channel.application.channel.UpdateChannelUserCase
 import com.example.pimcoreapi.channel.domain.data.channel.CreateChannelDto
 import com.example.pimcoreapi.channel.domain.data.channel.ResourceChannelDto
+import com.example.pimcoreapi.channel.domain.data.channel.UpdateChannelDto
 import com.example.pimcoreapi.shared.exception.data.ErrorResponse
 import com.example.pimcoreapi.shared.exception.domain.IsEmptyException
 import com.example.pimcoreapi.shared.exception.domain.NotFoundException
@@ -36,6 +38,8 @@ class ChannelControllerTest extends Specification {
     DeleteChannelUserCase deleteChannelUserCase = Mock(DeleteChannelUserCase)
     @SpringBean
     FindChannelUserCase findChannelUserCase = Mock(FindChannelUserCase)
+    @SpringBean
+    UpdateChannelUserCase updateChannelUserCase = Mock(UpdateChannelUserCase)
     @Autowired
     MockMvc mockMvc
     ObjectMapper objectMapper = new ObjectMapper()
@@ -47,9 +51,9 @@ class ChannelControllerTest extends Specification {
 
     def "Post type channel test for successful creation with a valid input and returning an object as a 200 response from the channel"() {
         given:
-        def requestBody = new CreateChannelDto([name: 'Test'])
+        def requestBody = new CreateChannelDto([name: "Test"])
         def requestJson = objectMapper.writeValueAsString(requestBody)
-        def expectedResponse = new ResourceChannelDto([name: 'Test', code: 'test'])
+        def expectedResponse = new ResourceChannelDto([name: "Test", code: "test"])
         when:
         def result = mockMvc.perform(
                 post("/api/channel")
@@ -79,15 +83,15 @@ class ChannelControllerTest extends Specification {
                         .content(requestJson)
         ).andReturn()
         then:
-        1 * createChannelUserCase.unitCreate(requestBody) >> { throw new ObjectNullException('Name') }
+        1 * createChannelUserCase.unitCreate(requestBody) >> { throw new ObjectNullException("Name") }
         and:
         result.getResponse().getStatus() == 400
         def actualResponseJson = objectMapper.readValue(result.getResponse().getContentAsString(), ErrorResponse.class)
         verifyAll() {
             actualResponseJson.status == 400
-            actualResponseJson.error == 'Bad Request'
-            actualResponseJson.message == 'Validation failed'
-            actualResponseJson.path == 'uri=/api/channel'
+            actualResponseJson.error == "Bad Request"
+            actualResponseJson.message == "Validation failed"
+            actualResponseJson.path == "uri=/api/channel"
         }
     }
 
@@ -108,7 +112,7 @@ class ChannelControllerTest extends Specification {
     def "Delete channel test for handling not found exception"() {
         given:
         String channelId = "nonExistentChannelId"
-        1 * deleteChannelUserCase.deleteById(channelId) >> { throw new NotFoundException('id', 'Channel') }
+        1 * deleteChannelUserCase.deleteById(channelId) >> { throw new NotFoundException("id", "Channel") }
         when:
         def result = mockMvc.perform(
                 delete("/api/channel/${channelId}")
@@ -119,8 +123,8 @@ class ChannelControllerTest extends Specification {
         def actualResponseJson = objectMapper.readValue(result.getResponse().getContentAsString(), ErrorResponse.class)
         verifyAll {
             actualResponseJson.status == 404
-            actualResponseJson.error == 'Not Found'
-            actualResponseJson.message == 'Validation failed'
+            actualResponseJson.error == "Not Found"
+            actualResponseJson.message == "Validation failed"
             actualResponseJson.path == "uri=/api/channel/${channelId}"
         }
     }
@@ -139,7 +143,7 @@ class ChannelControllerTest extends Specification {
     def "findById channel test for successful search"() {
         given:
         String channelId = "someChannelId"
-        def expectedResponse = new ResourceChannelDto([name: 'Test', code: 'test', id: 'id'])
+        def expectedResponse = new ResourceChannelDto([name: "Test", code: "test", id: "id"])
         when:
         def result = mockMvc.perform(
                 get("/api/channel/${channelId}")
@@ -173,8 +177,8 @@ class ChannelControllerTest extends Specification {
         def actualResponseJson = objectMapper.readValue(result.getResponse().getContentAsString(), ErrorResponse.class)
         verifyAll() {
             actualResponseJson.status == 404
-            actualResponseJson.error == 'Not Found'
-            actualResponseJson.message == 'Validation failed'
+            actualResponseJson.error == "Not Found"
+            actualResponseJson.message == "Validation failed"
             actualResponseJson.path == "uri=/api/channel/${channelId}"
         }
     }
@@ -194,8 +198,8 @@ class ChannelControllerTest extends Specification {
         def actualResponseJson = objectMapper.readValue(result.getResponse().getContentAsString(), ErrorResponse.class)
         verifyAll() {
             actualResponseJson.status == 400
-            actualResponseJson.error == 'Bad Request'
-            actualResponseJson.message == 'Validation failed'
+            actualResponseJson.error == "Bad Request"
+            actualResponseJson.message == "Validation failed"
             actualResponseJson.path == "uri=/api/channel/${channelId}"
         }
     }
@@ -203,9 +207,9 @@ class ChannelControllerTest extends Specification {
     def "findAll channel test for successful search"() {
         given:
         def expectedResponse = [
-                new ResourceChannelDto([name: 'Test', code: 'test', id: 'id']),
-                new ResourceChannelDto([name: 'Test1', code: 'test1', id: 'id1']),
-                new ResourceChannelDto([name: 'Test2', code: 'test2', id: 'id2'])
+                new ResourceChannelDto([name: "Test", code: "test", id: "id"]),
+                new ResourceChannelDto([name: "Test1", code: "test1", id: "id1"]),
+                new ResourceChannelDto([name: "Test2", code: "test2", id: "id2"])
         ]
         when:
         def result = mockMvc.perform(
@@ -226,5 +230,54 @@ class ChannelControllerTest extends Specification {
             actualResponseJson[index].id == expected.id
         }
 
+    }
+
+    def "Put type channel test for successful creation with a valid input and returning an object as a 200 response from the channel"() {
+        given:
+        def requestBody = new UpdateChannelDto([name: "Test"])
+        def id = "id"
+        def requestJson = objectMapper.writeValueAsString(requestBody)
+        def expectedResponse = new ResourceChannelDto([name: "Test", code: "test", id: id])
+        when:
+        def result = mockMvc.perform(
+                put("/api/channel/${id}")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestJson)
+        ).andReturn()
+
+        then:
+        1 * updateChannelUserCase.updateById(requestBody, id) >> expectedResponse
+        and:
+        result.getResponse().getStatus() == 200
+        def actualResponseJson = objectMapper.readValue(result.getResponse().getContentAsString(), ResourceChannelDto.class)
+        verifyAll {
+            actualResponseJson.name == expectedResponse.name
+            actualResponseJson.code == expectedResponse.code
+            actualResponseJson.id == expectedResponse.id
+        }
+    }
+
+    def "Put type channel test for error creation with a valid input and returning an object as a 4 response from the channel"() {
+        given:
+        def requestBody = new UpdateChannelDto([name: null])
+        def id = "id"
+        def requestJson = objectMapper.writeValueAsString(requestBody)
+        when:
+        def result = mockMvc.perform(
+                put("/api/channel/${id}")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestJson)
+        ).andReturn()
+        then:
+        1 * updateChannelUserCase.updateById(requestBody, id) >> { throw new ObjectNullException("Name") }
+        and:
+        result.getResponse().getStatus() == 400
+        def actualResponseJson = objectMapper.readValue(result.getResponse().getContentAsString(), ErrorResponse.class)
+        verifyAll() {
+            actualResponseJson.status == 400
+            actualResponseJson.error == "Bad Request"
+            actualResponseJson.message == "Validation failed"
+            actualResponseJson.path == "uri=/api/channel/${id}"
+        }
     }
 }

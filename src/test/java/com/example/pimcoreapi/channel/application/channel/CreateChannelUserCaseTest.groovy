@@ -23,12 +23,12 @@ class CreateChannelUserCaseTest extends Specification {
         this.subject = new CreateChannelUserCase(this.channelServicePort)
     }
 
-    def 'should return ResourceChannelDto object when valid CreateChannelDto is passed as argument'() {
+    def "should return ResourceChannelDto object when valid CreateChannelDto is passed as argument"() {
         given:
-        CreateChannelDto channelDto = new CreateChannelDto(name: 'Test Channel')
-        ResourceChannelDto expectedResourceChannelDto = new ResourceChannelDto(id: '1', name: 'Test Channel', code: 'TC', createdBy: 'Test', createdDate: LocalDateTime.now(), lastModifiedBy: 'Test', lastModifiedDate: LocalDateTime.now())
+        def channelDto = new CreateChannelDto(name: "Test Channel")
+        def expectedResourceChannelDto = new ResourceChannelDto(id: "1", name: "Test Channel", code: "TC", createdBy: "Test", createdDate: LocalDateTime.now(), lastModifiedBy: "Test", lastModifiedDate: LocalDateTime.now())
         when:
-        ResourceChannelDto result = this.subject.unitCreate(channelDto)
+        def result = this.subject.unitCreate(channelDto)
         then:
         1 * channelServicePort.create(channelDto) >> expectedResourceChannelDto
         and:
@@ -36,15 +36,27 @@ class CreateChannelUserCaseTest extends Specification {
         result == expectedResourceChannelDto
     }
 
-    def 'should return ResourceChannelDto object when valid CreateChannelDto is passed as error'() {
+    def "should return exception ObjectNullException object when invalid name in dto is passed as error"() {
         given:
-        CreateChannelDto channelDto = new CreateChannelDto(name: 'Test Channel')
+        def channelDto = new CreateChannelDto(name: "Test Channel")
         when:
         this.subject.unitCreate(channelDto)
         then:
-        channelServicePort.create(channelDto) >> { throw new ObjectNullException('Name') }
+        channelServicePort.create(channelDto) >> { throw new ObjectNullException("Name") }
         def exception = thrown(Exception)
         exception instanceof ObjectNullException
         exception.message == "The object: Name is null"
+    }
+
+    def "should return exception ObjectNullException object when invalid dto is null is passed as error"() {
+        given:
+        CreateChannelDto channelDto = null
+        when:
+        this.subject.unitCreate(channelDto)
+        then:
+        channelServicePort.create(channelDto) >> { throw new ObjectNullException("Channel Created") }
+        def exception = thrown(Exception)
+        exception instanceof ObjectNullException
+        exception.message == "The object: Channel Created is null"
     }
 }

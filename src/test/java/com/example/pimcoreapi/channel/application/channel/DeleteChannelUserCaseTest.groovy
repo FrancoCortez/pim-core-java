@@ -21,9 +21,9 @@ class DeleteChannelUserCaseTest extends Specification {
         this.subject = new DeleteChannelUserCase(this.channelServicePort)
     }
 
-    def 'should call deleteById method with given id parameter'() {
+    def "should call deleteById method with given id parameter"() {
         given:
-        def deleteId = 'someId'
+        def deleteId = "someId"
         when:
         this.subject.deleteById(deleteId)
         then:
@@ -31,22 +31,22 @@ class DeleteChannelUserCaseTest extends Specification {
     }
 
 
-    def 'should throw IllegalArgumentException when id parameter is null'() {
+    def "should throw IllegalArgumentException when id parameter is null"() {
         given:
-        def deleteId = 'notFoundId'
+        def deleteId = "notFoundId"
         when:
         this.subject.deleteById(deleteId)
         then:
-        1 * channelServicePort.deleteById(_) >> { throw new NotFoundException(deleteId, 'Channel') }
+        1 * channelServicePort.deleteById(_) >> { throw new NotFoundException(deleteId, "Channel") }
         and:
         def exception = thrown(Exception)
         exception instanceof NotFoundException
         exception.message == "The Channel object for id notFoundId not found"
     }
 
-    def 'should throw IsEmptyException when id parameter is null'() {
+    def "should throw IsEmptyException when id parameter is null"() {
         given:
-        def deleteId = 'notFoundId'
+        def deleteId = "notFoundId"
         when:
         this.subject.deleteById(deleteId)
         then:
@@ -57,7 +57,7 @@ class DeleteChannelUserCaseTest extends Specification {
         exception.message == "The argument: id is empty for object: delete Channel"
     }
 
-    def 'should call deleteAll method with given id parameter'() {
+    def "should call deleteAll method with given id parameter"() {
         when:
         this.subject.deleteAll()
         then:

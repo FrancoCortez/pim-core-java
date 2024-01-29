@@ -2,6 +2,7 @@ package com.example.pimcoreapi.channel.domain.ports.spi
 
 import com.example.pimcoreapi.channel.domain.data.channel.CreateChannelDto
 import com.example.pimcoreapi.channel.domain.data.channel.ResourceChannelDto
+import com.example.pimcoreapi.channel.domain.data.channel.UpdateChannelDto
 import com.example.pimcoreapi.channel.infrastructure.adapters.ChannelPersistencePortAdapter
 import com.example.pimcoreapi.channel.infrastructure.entities.Channel
 import com.example.pimcoreapi.channel.infrastructure.mappers.ChannelMappers
@@ -40,6 +41,30 @@ class ChannelPersistencePortTest extends Specification {
         def result = subject.create(channelDto, code)
         then:
         1 * this.mapper.toModelCreate(_, _) >> entityResult
+        1 * this.repository.save(_) >> entityResult
+        1 * this.mapper.toResource(_) >> expectResult
+        and:
+        result instanceof ResourceChannelDto
+        verifyAll(result) {
+            id == expectResult.id
+            name == expectResult.name
+            code == expectResult.code
+        }
+    }
+
+    @Timeout(value = 100, unit = TimeUnit.MILLISECONDS)
+    def "updateById: should create channel with valid input and return ResourceChannelDto object"() {
+        given:
+        def name = "Test Channel"
+        def code = "12345"
+        def id = "id"
+        def updateChannelDto = new UpdateChannelDto([name: name])
+        def entityResult = new Channel([id: "id", name: name, code: code])
+        def expectResult = new ResourceChannelDto([id: "id", name: name, code: code])
+        when:
+        def result = this.subject.updateById(updateChannelDto, id, code)
+        then:
+        1 * this.mapper.toModelCreateUpdate(_, _, _) >> entityResult
         1 * this.repository.save(_) >> entityResult
         1 * this.mapper.toResource(_) >> expectResult
         and:
@@ -95,14 +120,14 @@ class ChannelPersistencePortTest extends Specification {
     def "findAll: should return List ResourceChannelDto"() {
         given:
         def expectedResponse = [
-                new ResourceChannelDto([name: 'Test', code: 'test', id: 'id']),
-                new ResourceChannelDto([name: 'Test1', code: 'test1', id: 'id1']),
-                new ResourceChannelDto([name: 'Test2', code: 'test2', id: 'id2'])
+                new ResourceChannelDto([name: "Test", code: "test", id: "id"]),
+                new ResourceChannelDto([name: "Test1", code: "test1", id: "id1"]),
+                new ResourceChannelDto([name: "Test2", code: "test2", id: "id2"])
         ]
         def mockEntity = [
-                new Channel([name: 'Test', code: 'test', id: 'id']),
-                new Channel([name: 'Test1', code: 'test1', id: 'id1']),
-                new Channel([name: 'Test2', code: 'test2', id: 'id2'])
+                new Channel([name: "Test", code: "test", id: "id"]),
+                new Channel([name: "Test1", code: "test1", id: "id1"]),
+                new Channel([name: "Test2", code: "test2", id: "id2"])
         ]
         when:
         def result = subject.findAll()
